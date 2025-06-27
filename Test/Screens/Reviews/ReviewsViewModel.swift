@@ -49,9 +49,22 @@ private extension ReviewsViewModel {
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
+
+            state.items.removeAll { $0 is ReviewCountCellConfig }
+
             state.items += reviews.items.map(makeReviewItem)
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
+
+            if !state.shouldLoad {
+                let countText = pluralizedString(for: reviews.count)
+                let attributedText = countText.attributed(
+                    font: .reviewCount,
+                    color: .reviewCount
+                )
+                let countItem = ReviewCountCellConfig(countText: attributedText)
+                state.items.append(countItem)
+            }
         } catch {
             state.shouldLoad = true
         }
@@ -145,4 +158,23 @@ extension ReviewsViewModel: UITableViewDelegate {
         return remainingDistance <= triggerDistance
     }
 
+}
+
+private extension ReviewsViewModel {
+    func pluralizedString(for count: Int) -> String {
+        let lastTwoDigits = count % 100
+        if (11...19).contains(lastTwoDigits) {
+            return "\(count) отзывов"
+        }
+
+        let lastDigit = count % 10
+        switch lastDigit {
+        case 1:
+            return "\(count) отзыв"
+        case 2, 3, 4:
+            return "\(count) отзыва"
+        default:
+            return "\(count) отзывов"
+        }
+    }
 }
