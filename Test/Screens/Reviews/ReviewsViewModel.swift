@@ -103,7 +103,10 @@ private extension ReviewsViewModel {
             ratingImage: ratingImage,
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview
+            onTapShowMore: { [weak self] id in
+                guard let self else { return }
+                self.showMoreReview(with: id)
+            }
         )
         return item
     }
