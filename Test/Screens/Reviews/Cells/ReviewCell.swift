@@ -286,66 +286,87 @@ private final class ReviewCellLayout {
             return cachedHeight
         }
 
-        avatarImageViewFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: insets.top),
-            size: Self.avatarSize
-        )
-
-        let contentX = avatarImageViewFrame.maxX + avatarToUsernameSpacing
+        let contentX = insets.left + Self.avatarSize.width + avatarToUsernameSpacing
         let contentWidth = maxWidth - contentX - insets.right
+        
+        var maxY = layoutTopBlock(config: config, contentX: contentX, contentWidth: contentWidth)
+        
+        maxY = layoutPhotosBlock(config: config, contentX: contentX, currentY: maxY)
+        
+        maxY = layoutBottomBlock(config: config, contentX: contentX, contentWidth: contentWidth, currentY: maxY)
+        
+        let finalHeight = maxY + insets.bottom
+        cachedHeight = finalHeight
+        return finalHeight
+    }
+    
+}
 
+// MARK: - Private methods Layout
+
+private extension ReviewCellLayout {
+    /// Верхний блок: аватар, имя, рейтинг
+    func layoutTopBlock(config: Config, contentX: CGFloat, contentWidth: CGFloat) -> CGFloat {
+        avatarImageViewFrame = CGRect(origin: CGPoint(x: insets.left, y: insets.top), size: Self.avatarSize)
+        
         usernameLabelFrame = CGRect(
             origin: CGPoint(x: contentX, y: insets.top),
             size: config.username.boundingRect(width: contentWidth).size
         )
-
+        
         ratingImageViewFrame = CGRect(
-            origin: CGPoint(
-                x: contentX,
-                y: usernameLabelFrame.maxY + usernameToRatingSpacing
-            ),
+            origin: CGPoint(x: contentX, y: usernameLabelFrame.maxY + usernameToRatingSpacing),
             size: config.ratingImage.size
         )
-
-        var maxY = max(avatarImageViewFrame.maxY, ratingImageViewFrame.maxY)
-
+        
+        return max(avatarImageViewFrame.maxY, ratingImageViewFrame.maxY)
+    }
+    
+    /// Блок с фотографиями
+    func layoutPhotosBlock(config: Config, contentX: CGFloat, currentY: CGFloat) -> CGFloat {
+        var newY = currentY
+        
         if !config.photoUrls.isEmpty {
-            maxY += ratingToPhotosSpacing
+            newY += ratingToPhotosSpacing
             let stackWidth = CGFloat(config.photoUrls.count) * Self.photoSize.width + CGFloat(config.photoUrls.count - 1) * Layout.photosSpacing
             photosStackViewFrame = CGRect(
-                origin: CGPoint(x: contentX, y: maxY),
+                origin: CGPoint(x: contentX, y: newY),
                 size: CGSize(width: stackWidth, height: Self.photoSize.height)
             )
-            maxY = photosStackViewFrame.maxY
+            newY = photosStackViewFrame.maxY
         } else {
             photosStackViewFrame = .zero
         }
-
-        var hasContentBelowGallery = false
-
+        
+        return newY
+    }
+    
+    /// Нижний блок: текст, кнопка, дата
+    func layoutBottomBlock(config: Config, contentX: CGFloat, contentWidth: CGFloat, currentY: CGFloat) -> CGFloat {
+        var newY = currentY
+        var hasTextContent = false
+        
         if !config.reviewText.isEmpty() {
-            hasContentBelowGallery = true
-            maxY += photosToTextSpacing
+            hasTextContent = true
+            newY += photosToTextSpacing
 
             let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
-            // Максимально возможная высота текста, если бы ограничения не было.
             let actualTextHeight = config.reviewText.boundingRect(width: contentWidth).size.height
-            // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
             let showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
             
             reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: contentX, y: maxY),
+                origin: CGPoint(x: contentX, y: newY),
                 size: config.reviewText.boundingRect(width: contentWidth, height: currentTextHeight).size
             )
-            maxY = reviewTextLabelFrame.maxY
+            newY = reviewTextLabelFrame.maxY
 
             if showShowMoreButton {
-                maxY += reviewTextToCreatedSpacing
+                newY += reviewTextToCreatedSpacing
                 showMoreButtonFrame = CGRect(
-                    origin: CGPoint(x: contentX, y: maxY),
+                    origin: CGPoint(x: contentX, y: newY),
                     size: Self.showMoreButtonSize
                 )
-                maxY = showMoreButtonFrame.maxY
+                newY = showMoreButtonFrame.maxY
             } else {
                 showMoreButtonFrame = .zero
             }
@@ -355,25 +376,22 @@ private final class ReviewCellLayout {
         }
 
         if !config.created.isEmpty() {
-            let spacing = hasContentBelowGallery ?
-                (showMoreButtonFrame != .zero ? showMoreToCreatedSpacing : reviewTextToCreatedSpacing) :
-                photosToTextSpacing
+            let spacing = hasTextContent ?
+            (showMoreButtonFrame != .zero ? showMoreToCreatedSpacing : reviewTextToCreatedSpacing) :
+            photosToTextSpacing
             
-            maxY += spacing
+            newY += spacing
 
             createdLabelFrame = CGRect(
-                origin: CGPoint(x: contentX, y: maxY),
+                origin: CGPoint(x: contentX, y: newY),
                 size: config.created.boundingRect(width: contentWidth).size
             )
-            maxY = createdLabelFrame.maxY
+            newY = createdLabelFrame.maxY
         } else {
             createdLabelFrame = .zero
         }
         
-        let finalHeight = maxY + insets.bottom
-
-        cachedHeight = finalHeight
-        return finalHeight
+        return newY
     }
 
 }
