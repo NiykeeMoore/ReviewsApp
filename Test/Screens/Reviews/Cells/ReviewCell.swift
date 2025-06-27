@@ -110,9 +110,7 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
-        avatarImageView.image = UIImage(systemName: "person.fill")
-        avatarImageView.tintColor = .systemGray
-        avatarImageView.backgroundColor = .systemGray5
+        avatarImageView.image = UIImage(named: "avatar_placeholder")
         avatarImageView.clipsToBounds = true
         avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
     }
@@ -191,9 +189,6 @@ private final class ReviewCellLayout {
 
     /// Возвращает высоту ячейку с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
     func height(config: Config, maxWidth: CGFloat) -> CGFloat {
-        let width = maxWidth - insets.left - insets.right
-        var topPartMaxY: CGFloat
-
         avatarImageViewFrame = CGRect(
             origin: CGPoint(x: insets.left, y: insets.top),
             size: Self.avatarSize
@@ -215,9 +210,7 @@ private final class ReviewCellLayout {
             size: config.ratingImage.size
         )
 
-        topPartMaxY = max(avatarImageViewFrame.maxY, ratingImageViewFrame.maxY)
-
-        var maxY = topPartMaxY
+        var maxY = ratingImageViewFrame.maxY
         var showShowMoreButton = false
 
         if !config.reviewText.isEmpty() {
@@ -226,35 +219,44 @@ private final class ReviewCellLayout {
             // Высота текста с текущим ограничением по количеству строк.
             let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
             // Максимально возможная высота текста, если бы ограничения не было.
-            let actualTextHeight = config.reviewText.boundingRect(width: width).size.height
+            let actualTextHeight = config.reviewText.boundingRect(width: contentWidth).size.height
             // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
 
             reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
-                size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
+                origin: CGPoint(x: contentX, y: maxY),
+                size: config.reviewText.boundingRect(width: contentWidth, height: currentTextHeight).size
             )
-            maxY = reviewTextLabelFrame.maxY + reviewTextToCreatedSpacing
+            maxY = reviewTextLabelFrame.maxY
         } else {
             reviewTextLabelFrame = .zero
         }
 
         if showShowMoreButton {
+            maxY += reviewTextToCreatedSpacing
             showMoreButtonFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
+                origin: CGPoint(x: contentX, y: maxY),
                 size: Self.showMoreButtonSize
             )
-            maxY = showMoreButtonFrame.maxY + showMoreToCreatedSpacing
+            maxY = showMoreButtonFrame.maxY
         } else {
             showMoreButtonFrame = .zero
         }
 
-        createdLabelFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: maxY),
-            size: config.created.boundingRect(width: width).size
-        )
+        if !config.created.isEmpty() {
+            maxY += (showShowMoreButton ? showMoreToCreatedSpacing : reviewTextToCreatedSpacing)
+            createdLabelFrame = CGRect(
+                origin: CGPoint(x: contentX, y: maxY),
+                size: config.created.boundingRect(width: contentWidth).size
+            )
+            maxY = createdLabelFrame.maxY
+        } else {
+            createdLabelFrame = .zero
+        }
+        
+        let finalHeight = max(avatarImageViewFrame.maxY, maxY)
 
-        return createdLabelFrame.maxY + insets.bottom
+        return finalHeight + insets.bottom
     }
 
 }
