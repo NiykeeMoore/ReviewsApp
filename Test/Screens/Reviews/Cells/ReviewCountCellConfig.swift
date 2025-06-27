@@ -78,12 +78,17 @@ private extension ReviewCountCell {
 // MARK: - Layout
 
 private final class ReviewCountCellLayout {
+    private var cachedHeight: CGFloat?
     private(set) var countLabelFrame = CGRect.zero
     
     /// Отступы от краёв ячейки до её содержимого.
     private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
     
     func height(config: Config, maxWidth: CGFloat) -> CGFloat {
+        if let cachedHeight = cachedHeight {
+            return cachedHeight
+        }
+        
         let contentWidth = maxWidth - insets.left - insets.right
         let labelSize = config.countText.boundingRect(width: contentWidth).size
         
@@ -94,7 +99,9 @@ private final class ReviewCountCellLayout {
             height: labelSize.height
         )
         
-        return insets.top + labelSize.height + insets.bottom
+        let finalHeight = insets.top + labelSize.height + insets.bottom
+        cachedHeight = finalHeight
+        return finalHeight
     }
 }
 
