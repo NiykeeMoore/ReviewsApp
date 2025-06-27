@@ -39,6 +39,14 @@ extension ReviewsViewModel {
     func getReviews() {
         guard state.shouldLoad else { return }
         state.shouldLoad = false
+        
+        if state.offset == 0 {
+            state.loadingState = .initial
+        } else {
+            state.loadingState = .pagination
+        }
+        
+        onStateChange?(state)
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
 
@@ -50,6 +58,8 @@ private extension ReviewsViewModel {
 
     /// Метод обработки получения отзывов.
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
+        state.loadingState = .idle
+        
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
