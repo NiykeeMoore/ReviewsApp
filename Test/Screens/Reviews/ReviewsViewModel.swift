@@ -50,9 +50,9 @@ private extension ReviewsViewModel {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
 
-            state.items.removeAll { $0 is ReviewCountCellConfig }
+            var updatedItems = state.items.filter { !($0 is ReviewCountCellConfig) }
+            updatedItems += reviews.items.map(makeReviewItem)
 
-            state.items += reviews.items.map(makeReviewItem)
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
 
@@ -63,8 +63,10 @@ private extension ReviewsViewModel {
                     color: .reviewCount
                 )
                 let countItem = ReviewCountCellConfig(countText: attributedText)
-                state.items.append(countItem)
+                updatedItems.append(countItem)
             }
+            
+            state.items = updatedItems
         } catch {
             state.shouldLoad = true
         }
