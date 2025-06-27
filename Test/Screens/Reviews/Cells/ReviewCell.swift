@@ -159,7 +159,7 @@ private extension ReviewCell {
     }
     
     func setAvatarPlaceholder() {
-        avatarImageView.image = UIImage(named: "avatar_placeholder")
+        avatarImageView.image = AppConstants.Placeholders.avatar
     }
     
     func loadAvatar(from url: URL?, using imageLoader: ImageLoader) {

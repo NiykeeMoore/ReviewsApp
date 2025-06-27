@@ -28,6 +28,7 @@
 		21ED1F622D69CBCD0012D6F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F612D69CBCD0012D6F6 /* RootView.swift */; };
 		21ED1F652D69D0340012D6F6 /* ReviewsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */; };
 		4B9E8C802E0E90CD00102066 /* ReviewCountCellConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E8C7F2E0E90CD00102066 /* ReviewCountCellConfig.swift */; };
+		4B9E8C852E0EC5D500102066 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E8C842E0EC5D500102066 /* AppConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		21ED1F612D69CBCD0012D6F6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsScreenFactory.swift; sourceTree = "<group>"; };
 		4B9E8C7F2E0E90CD00102066 /* ReviewCountCellConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCountCellConfig.swift; sourceTree = "<group>"; };
+		4B9E8C842E0EC5D500102066 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -85,6 +87,7 @@
 		216668742D48EA59009AAA76 /* Constants */ = {
 			isa = PBXGroup;
 			children = (
+				4B9E8C842E0EC5D500102066 /* AppConstants.swift */,
 				2166686E2D48E23F009AAA76 /* Fonts.swift */,
 				216668722D48E89A009AAA76 /* Colors.swift */,
 			);
@@ -278,6 +281,7 @@
 				21B82E392D47B1320085DAA2 /* Review.swift in Sources */,
 				21B8416D2D47C0E20085DAA2 /* ReviewsViewModelState.swift in Sources */,
 				21B82E2E2D47B0640085DAA2 /* ReviewCell.swift in Sources */,
+				4B9E8C852E0EC5D500102066 /* AppConstants.swift in Sources */,
 				21ED1F622D69CBCD0012D6F6 /* RootView.swift in Sources */,
 				21667B802D4A25B2009AAA76 /* RatingRenderer.swift in Sources */,
 				4B9E8C802E0E90CD00102066 /* ReviewCountCellConfig.swift in Sources */,
