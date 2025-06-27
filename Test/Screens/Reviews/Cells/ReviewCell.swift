@@ -121,6 +121,8 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
+        avatarImageView.clipsToBounds = true
+        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
     }
     
     func setupUsernameLabel() {
@@ -156,11 +158,12 @@ private extension ReviewCell {
         showMoreButton.addAction(action, for: .touchUpInside)
     }
     
-    func loadAvatar(from url: URL?, using imageLoader: ImageLoader) {
+    func setAvatarPlaceholder() {
         avatarImageView.image = UIImage(named: "avatar_placeholder")
-        avatarImageView.clipsToBounds = true
-        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
-
+    }
+    
+    func loadAvatar(from url: URL?, using imageLoader: ImageLoader) {
+        setAvatarPlaceholder()
         currentAvatarUrl = url
         
         guard let url else { return }
@@ -172,7 +175,13 @@ private extension ReviewCell {
             else {
                 return
             }
-            self.avatarImageView.image = image ?? UIImage(named: "avatar_placeholder")
+            
+            if let image {
+                self.avatarImageView.image = image
+                self.avatarImageView.backgroundColor = .clear
+            } else {
+                self.setAvatarPlaceholder()
+            }
         }
     }
 
