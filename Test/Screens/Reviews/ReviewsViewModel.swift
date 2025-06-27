@@ -9,17 +9,21 @@ final class ReviewsViewModel: NSObject {
     private var state: State
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
+    private let imageLoader: ImageLoader
     private let decoder: JSONDecoder
 
     init(
         state: State = State(),
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
         ratingRenderer: RatingRenderer = RatingRenderer(),
+        imageLoader: ImageLoader,
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.state = state
         self.reviewsProvider = reviewsProvider
         self.ratingRenderer = ratingRenderer
+        self.imageLoader = imageLoader
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         self.decoder = decoder
     }
 
@@ -105,6 +109,8 @@ private extension ReviewsViewModel {
             ratingImage: ratingImage,
             reviewText: reviewText,
             created: created,
+            avatarUrl: review.avatarUrl,
+            imageLoader: imageLoader,
             onTapShowMore: { [weak self] id in
                 guard let self else { return }
                 self.showMoreReview(with: id)

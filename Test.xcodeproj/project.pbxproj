@@ -55,6 +55,14 @@
 		4B9E8C7F2E0E90CD00102066 /* ReviewCountCellConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCountCellConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4B9E8C812E0EBE3100102066 /* Services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		21B82DF62D4792300085DAA2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -129,6 +137,7 @@
 		21B82E2A2D47B0640085DAA2 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				4B9E8C812E0EBE3100102066 /* Services */,
 				21ED1F632D69CF860012D6F6 /* Root */,
 				21B82E372D47B1090085DAA2 /* Reviews */,
 			);
@@ -204,6 +213,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4B9E8C812E0EBE3100102066 /* Services */,
 			);
 			name = Test;
 			packageProductDependencies = (

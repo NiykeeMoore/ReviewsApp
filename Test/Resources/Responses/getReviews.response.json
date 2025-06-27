@@ -4,153 +4,143 @@
         {
             "first_name": "Иван",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704d",
             "rating": 5,
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
+            "photo_urls": [
+                "https://loremflickr.com/320/240/shoes?lock=1",
+                "https://loremflickr.com/320/240/shoes?lock=2"
+            ],
             "created": "1 час назад"
         },
         {
             "first_name": "Екатерина",
             "last_name": "Иванова",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704e",
             "rating": 3,
             "text": "Скользские ужасно.",
+            "photo_urls": [],
             "created": "12 минут назад"
         },
         {
             "first_name": "Евгения",
             "last_name": "Петрова",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704f",
             "rating": 4,
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
+            "photo_urls": [
+                "https://loremflickr.com/320/240/ice?lock=3",
+                "https://loremflickr.com/320/240/snow?lock=4",
+                "https://loremflickr.com/320/240/winter?lock=5"
+            ],
             "created": "35 минут назад"
         },
         {
             "first_name": "Илья",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704a",
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
+            "photo_urls": [],
             "created": "минуту назад"
         },
         {
             "first_name": "Никита",
             "last_name": "Иванов",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704b",
             "rating": 5,
             "text": "Отлично выглядят, хоть и скользковатые...",
+            "photo_urls": [
+                "https://loremflickr.com/320/240/sneakers?lock=6"
+            ],
             "created": "только что"
         },
         {
             "first_name": "Олег",
             "last_name": "Николаев",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704c",
             "rating": 1,
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
+            "photo_urls": [],
             "created": "15 минут назад"
         },
         {
             "first_name": "Николай",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704d",
             "rating": 2,
             "text": "",
+            "photo_urls": [],
             "created": "вчера в 12:39"
         },
-
-
         {
             "first_name": "Иван",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704e",
             "rating": 5,
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
+            "photo_urls": [
+                 "https://loremflickr.com/320/240/shoes?lock=1",
+                 "https://loremflickr.com/320/240/shoes?lock=2"
+            ],
             "created": "1 час назад"
         },
         {
             "first_name": "Екатерина",
             "last_name": "Иванова",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704f",
             "rating": 3,
             "text": "Скользские ужасно.",
+            "photo_urls": [],
             "created": "12 минут назад"
         },
         {
             "first_name": "Евгения",
             "last_name": "Петрова",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704a",
             "rating": 4,
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
+            "photo_urls": [
+                "https://loremflickr.com/320/240/ice?lock=3",
+                "https://loremflickr.com/320/240/snow?lock=4"
+            ],
             "created": "35 минут назад"
         },
         {
             "first_name": "Илья",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704b",
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
+            "photo_urls": [],
             "created": "минуту назад"
         },
         {
             "first_name": "Никита",
             "last_name": "Иванов",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704c",
             "rating": 5,
             "text": "Отлично выглядят, хоть и скользковатые...",
+            "photo_urls": [],
             "created": "только что"
         },
         {
             "first_name": "Олег",
             "last_name": "Николаев",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704d",
             "rating": 1,
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
+            "photo_urls": [],
             "created": "15 минут назад"
         },
         {
             "first_name": "Николай",
             "last_name": "Петров",
+            "avatar_url": "https://i.pravatar.cc/150?u=a042581f4e29026704e",
             "rating": 2,
             "text": "",
+            "photo_urls": [],
             "created": "вчера в 12:39"
-        },
-
-
-        {
-            "first_name": "Иван",
-            "last_name": "Петров",
-            "rating": 5,
-            "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
-            "created": "1 час назад"
-        },
-        {
-            "first_name": "Екатерина",
-            "last_name": "Иванова",
-            "rating": 3,
-            "text": "Скользские ужасно.",
-            "created": "12 минут назад"
-        },
-        {
-            "first_name": "Евгения",
-            "last_name": "Петрова",
-            "rating": 4,
-            "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "35 минут назад"
-        },
-        {
-            "first_name": "Илья",
-            "last_name": "Петров",
-            "rating": 2,
-            "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "минуту назад"
-        },
-        {
-            "first_name": "Никита",
-            "last_name": "Иванов",
-            "rating": 5,
-            "text": "Отлично выглядят, хоть и скользковатые...",
-            "created": "только что"
-        },
-        {
-            "first_name": "Олег",
-            "last_name": "Николаев",
-            "rating": 1,
-            "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
-            "created": "15 минут назад"
-        },
-        {
-            "first_name": "Николай",
-            "last_name": "Петров",
-            "rating": 2,
-            "text": "",
-            "created": "вчера в 12:39"
-        },
+        }
     ]
 }

@@ -22,6 +22,10 @@ struct ReviewCellConfig {
     }
     /// Время создания отзыва.
     let created: NSAttributedString
+    /// Аватар
+    let avatarUrl: URL?
+    /// Сервис для загрузки картинок
+    let imageLoader: ImageLoader
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
 
@@ -44,6 +48,8 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
         cell.config = self
+        
+        cell.loadAvatar(from: avatarUrl, using: imageLoader)
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -75,6 +81,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let ratingImageView = UIImageView()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
+    fileprivate var currentAvatarUrl: URL?
     fileprivate let showMoreButton = UIButton()
 
     required init?(coder: NSCoder) {
@@ -114,9 +121,6 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
-        avatarImageView.image = UIImage(named: "avatar_placeholder")
-        avatarImageView.clipsToBounds = true
-        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
     }
     
     func setupUsernameLabel() {
@@ -150,6 +154,26 @@ private extension ReviewCell {
             self.config?.onTapShowMore(id)
         }
         showMoreButton.addAction(action, for: .touchUpInside)
+    }
+    
+    func loadAvatar(from url: URL?, using imageLoader: ImageLoader) {
+        avatarImageView.image = UIImage(named: "avatar_placeholder")
+        avatarImageView.clipsToBounds = true
+        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
+
+        currentAvatarUrl = url
+        
+        guard let url else { return }
+
+        imageLoader.loadImage(from: url) { [weak self] image in
+            guard
+                let self,
+                self.currentAvatarUrl == url
+            else {
+                return
+            }
+            self.avatarImageView.image = image ?? UIImage(named: "avatar_placeholder")
+        }
     }
 
 }
