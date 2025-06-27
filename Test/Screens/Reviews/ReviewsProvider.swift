@@ -28,7 +28,10 @@ extension ReviewsProvider {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
             
-            guard let url = self.bundle.url(forResource: "getReviews.response", withExtension: "json") else {
+            guard let url = self.bundle.url(
+                forResource: AppConstants.API.reviewsResponseFileName,
+                withExtension: AppConstants.API.reviewsResponseFileExtension
+            ) else {
                 DispatchQueue.main.async {
                     completion(.failure(.badURL))
                 }

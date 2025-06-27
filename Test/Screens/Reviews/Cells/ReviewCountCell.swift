@@ -1,5 +1,5 @@
 //
-//  ReviewCountCellConfig.swift
+//  ReviewCountCell.swift
 //  Test
 //
 //  Created by Владимир Головин on 27.06.2025.

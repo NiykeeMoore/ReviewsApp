@@ -9,17 +9,21 @@ final class ReviewsViewModel: NSObject {
     private var state: State
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
+    private let imageLoader: ImageLoader
     private let decoder: JSONDecoder
 
     init(
         state: State = State(),
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
         ratingRenderer: RatingRenderer = RatingRenderer(),
+        imageLoader: ImageLoader,
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.state = state
         self.reviewsProvider = reviewsProvider
         self.ratingRenderer = ratingRenderer
+        self.imageLoader = imageLoader
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         self.decoder = decoder
     }
 
@@ -35,6 +39,14 @@ extension ReviewsViewModel {
     func getReviews() {
         guard state.shouldLoad else { return }
         state.shouldLoad = false
+        
+        if state.offset == 0 {
+            state.loadingState = .initial
+        } else {
+            state.loadingState = .pagination
+        }
+        
+        onStateChange?(state)
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
 
@@ -46,6 +58,8 @@ private extension ReviewsViewModel {
 
     /// Метод обработки получения отзывов.
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
+        state.loadingState = .idle
+        
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
@@ -105,6 +119,9 @@ private extension ReviewsViewModel {
             ratingImage: ratingImage,
             reviewText: reviewText,
             created: created,
+            avatarUrl: review.avatarUrl,
+            photoUrls: review.photoUrls,
+            imageLoader: imageLoader,
             onTapShowMore: { [weak self] id in
                 guard let self else { return }
                 self.showMoreReview(with: id)
