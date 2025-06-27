@@ -140,6 +140,16 @@ private extension ReviewCell {
         contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        
+        let action = UIAction { [weak self] _ in
+            guard
+                let self,
+                let id = self.config?.id
+            else { return }
+            
+            self.config?.onTapShowMore(id)
+        }
+        showMoreButton.addAction(action, for: .touchUpInside)
     }
 
 }
