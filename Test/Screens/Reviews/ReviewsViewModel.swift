@@ -110,6 +110,7 @@ private extension ReviewsViewModel {
             reviewText: reviewText,
             created: created,
             avatarUrl: review.avatarUrl,
+            photoUrls: review.photoUrls,
             imageLoader: imageLoader,
             onTapShowMore: { [weak self] id in
                 guard let self else { return }

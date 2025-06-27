@@ -24,6 +24,8 @@ struct ReviewCellConfig {
     let created: NSAttributedString
     /// Аватар
     let avatarUrl: URL?
+    /// Фото в отзыве
+    let photoUrls: [URL]
     /// Сервис для загрузки картинок
     let imageLoader: ImageLoader
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
@@ -50,6 +52,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.config = self
         
         cell.loadAvatar(from: avatarUrl, using: imageLoader)
+        cell.loadPhotos(from: photoUrls, using: imageLoader)
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -82,6 +85,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate var currentAvatarUrl: URL?
+    fileprivate let photosStackView = UIStackView()
     fileprivate let showMoreButton = UIButton()
 
     required init?(coder: NSCoder) {
@@ -102,6 +106,7 @@ final class ReviewCell: UITableViewCell {
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
+        photosStackView.frame = layout.photosStackViewFrame
     }
 
 }
@@ -117,6 +122,7 @@ private extension ReviewCell {
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+        setupPhotosStackView()
     }
     
     func setupAvatarImageView() {
@@ -184,6 +190,36 @@ private extension ReviewCell {
             }
         }
     }
+    
+    func setupPhotosStackView() {
+        contentView.addSubview(photosStackView)
+        photosStackView.axis = .horizontal
+        photosStackView.spacing = Layout.photosSpacing
+    }
+    
+    func loadPhotos(from urls: [URL], using imageLoader: ImageLoader) {
+            photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            photosStackView.isHidden = urls.isEmpty
+
+            for url in urls {
+                let imageView = UIImageView()
+                imageView.contentMode = .scaleAspectFill
+                imageView.clipsToBounds = true
+                imageView.layer.cornerRadius = Layout.photoCornerRadius
+                imageView.backgroundColor = .systemGray6
+
+                NSLayoutConstraint.activate([
+                    imageView.widthAnchor.constraint(equalToConstant: Layout.photoSize.width),
+                    imageView.heightAnchor.constraint(equalToConstant: Layout.photoSize.height)
+                ])
+
+                imageLoader.loadImage(from: url) { image in
+                    imageView.image = image
+                }
+
+                photosStackView.addArrangedSubview(imageView)
+            }
+        }
 
 }
 
@@ -203,7 +239,7 @@ private final class ReviewCellLayout {
     fileprivate static let avatarCornerRadius = 18.0
     fileprivate static let photoCornerRadius = 8.0
 
-    private static let photoSize = CGSize(width: 55.0, height: 66.0)
+    fileprivate static let photoSize = CGSize(width: 55.0, height: 66.0)
     private static let showMoreButtonSize = Config.showMoreText.size()
 
     // MARK: - Фреймы
@@ -213,6 +249,7 @@ private final class ReviewCellLayout {
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
+    private(set) var photosStackViewFrame = CGRect.zero
 
     // MARK: - Отступы
 
@@ -228,7 +265,7 @@ private final class ReviewCellLayout {
     /// Вертикальный отступ от вью рейтинга до фото.
     private let ratingToPhotosSpacing = 10.0
     /// Горизонтальные отступы между фото.
-    private let photosSpacing = 8.0
+    fileprivate static let photosSpacing = 8.0
     /// Вертикальный отступ от фото (если они есть) до текста отзыва.
     private let photosToTextSpacing = 10.0
     /// Вертикальный отступ от текста отзыва до времени создания отзыва или кнопки "Показать полностью..." (если она есть).
@@ -249,15 +286,13 @@ private final class ReviewCellLayout {
             return cachedHeight
         }
 
-        let contentWidth = maxWidth - insets.left - insets.right - Self.avatarSize.width - avatarToUsernameSpacing
-        let topPartMaxY: CGFloat
-
         avatarImageViewFrame = CGRect(
             origin: CGPoint(x: insets.left, y: insets.top),
             size: Self.avatarSize
         )
 
         let contentX = avatarImageViewFrame.maxX + avatarToUsernameSpacing
+        let contentWidth = maxWidth - contentX - insets.right
 
         usernameLabelFrame = CGRect(
             origin: CGPoint(x: contentX, y: insets.top),
@@ -272,49 +307,63 @@ private final class ReviewCellLayout {
             size: config.ratingImage.size
         )
 
-        topPartMaxY = max(avatarImageViewFrame.maxY, ratingImageViewFrame.maxY)
-        
-        var maxY = topPartMaxY
-        var showShowMoreButton = false
+        var maxY = max(avatarImageViewFrame.maxY, ratingImageViewFrame.maxY)
 
-        if !config.reviewText.isEmpty() {
-            let textYPosition = topPartMaxY + ratingToTextSpacing
-            
-            // Высота текста с текущим ограничением по количеству строк.
-            let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
-            // Максимально возможная высота текста, если бы ограничения не было.
-            let actualTextHeight = config.reviewText.boundingRect(width: maxWidth - insets.left - insets.right).size.height
-            // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
-            showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
-
-            reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: textYPosition),
-                size: config.reviewText.boundingRect(
-                    width: maxWidth - insets.left - insets.right,
-                    height: currentTextHeight
-                ).size
+        if !config.photoUrls.isEmpty {
+            maxY += ratingToPhotosSpacing
+            let stackWidth = CGFloat(config.photoUrls.count) * Self.photoSize.width + CGFloat(config.photoUrls.count - 1) * Layout.photosSpacing
+            photosStackViewFrame = CGRect(
+                origin: CGPoint(x: contentX, y: maxY),
+                size: CGSize(width: stackWidth, height: Self.photoSize.height)
             )
-            maxY = reviewTextLabelFrame.maxY
+            maxY = photosStackViewFrame.maxY
         } else {
-            reviewTextLabelFrame = .zero
+            photosStackViewFrame = .zero
         }
 
-        if showShowMoreButton {
-            maxY += reviewTextToCreatedSpacing
-            showMoreButtonFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
-                size: Self.showMoreButtonSize
+        var hasContentBelowGallery = false
+
+        if !config.reviewText.isEmpty() {
+            hasContentBelowGallery = true
+            maxY += photosToTextSpacing
+
+            let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
+            // Максимально возможная высота текста, если бы ограничения не было.
+            let actualTextHeight = config.reviewText.boundingRect(width: contentWidth).size.height
+            // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
+            let showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
+            
+            reviewTextLabelFrame = CGRect(
+                origin: CGPoint(x: contentX, y: maxY),
+                size: config.reviewText.boundingRect(width: contentWidth, height: currentTextHeight).size
             )
-            maxY = showMoreButtonFrame.maxY
+            maxY = reviewTextLabelFrame.maxY
+
+            if showShowMoreButton {
+                maxY += reviewTextToCreatedSpacing
+                showMoreButtonFrame = CGRect(
+                    origin: CGPoint(x: contentX, y: maxY),
+                    size: Self.showMoreButtonSize
+                )
+                maxY = showMoreButtonFrame.maxY
+            } else {
+                showMoreButtonFrame = .zero
+            }
         } else {
+            reviewTextLabelFrame = .zero
             showMoreButtonFrame = .zero
         }
 
         if !config.created.isEmpty() {
-            maxY += (showShowMoreButton ? showMoreToCreatedSpacing : reviewTextToCreatedSpacing)
+            let spacing = hasContentBelowGallery ?
+                (showMoreButtonFrame != .zero ? showMoreToCreatedSpacing : reviewTextToCreatedSpacing) :
+                photosToTextSpacing
+            
+            maxY += spacing
+
             createdLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
-                size: config.created.boundingRect(width: maxWidth - insets.left - insets.right).size
+                origin: CGPoint(x: contentX, y: maxY),
+                size: config.created.boundingRect(width: contentWidth).size
             )
             maxY = createdLabelFrame.maxY
         } else {
