@@ -89,7 +89,12 @@ final class ReviewCell: UITableViewCell {
         return imageView
     }()
 
-    fileprivate lazy var usernameLabel = UILabel()
+    fileprivate lazy var usernameLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     fileprivate lazy var ratingImageView = UIImageView()
 
     fileprivate lazy var reviewTextLabel: UILabel = {
@@ -135,7 +140,6 @@ final class ReviewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
-        usernameLabel.frame = layout.usernameLabelFrame
         ratingImageView.frame = layout.ratingImageViewFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
@@ -171,6 +175,11 @@ private extension ReviewCell {
     
     func setupUsernameLabel() {
         contentView.addSubview(usernameLabel)
+        NSLayoutConstraint.activate([
+            usernameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Constants.avatarToUsernameSpacing),
+            usernameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
+            usernameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.insets.right)
+        ])
     }
     
     func setupRatingImageView() {
