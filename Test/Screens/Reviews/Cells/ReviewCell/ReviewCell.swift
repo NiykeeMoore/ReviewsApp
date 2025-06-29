@@ -89,6 +89,15 @@ final class ReviewCell: UITableViewCell {
         return imageView
     }()
 
+    private lazy var headerStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = Constants.usernameToRatingSpacing
+        stackView.alignment = .leading
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
     fileprivate lazy var usernameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -132,6 +141,14 @@ final class ReviewCell: UITableViewCell {
         return button
     }()
 
+    private lazy var contentStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -158,12 +175,13 @@ private extension ReviewCell {
 
     func setupCell() {
         setupAvatarImageView()
-        setupUsernameLabel()
-        setupRatingImageView()
+        contentView.addSubview(contentStackView)
+        setupHeaderStackView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
         setupPhotosStackView()
+        setupContentStackViewConstraints()
     }
     
     func setupAvatarImageView() {
@@ -176,21 +194,10 @@ private extension ReviewCell {
         ])
     }
     
-    func setupUsernameLabel() {
-        contentView.addSubview(usernameLabel)
-        NSLayoutConstraint.activate([
-            usernameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Constants.avatarToUsernameSpacing),
-            usernameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
-            usernameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.insets.right)
-        ])
-    }
-    
-    func setupRatingImageView() {
-        contentView.addSubview(ratingImageView)
-        NSLayoutConstraint.activate([
-            ratingImageView.leadingAnchor.constraint(equalTo: usernameLabel.leadingAnchor),
-            ratingImageView.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: Constants.usernameToRatingSpacing)
-        ])
+    func setupHeaderStackView() {
+        headerStackView.addArrangedSubview(usernameLabel)
+        headerStackView.addArrangedSubview(ratingImageView)
+        contentStackView.addArrangedSubview(headerStackView)
     }
     
     func setupReviewTextLabel() {
@@ -263,6 +270,15 @@ private extension ReviewCell {
                 photosStackView.addArrangedSubview(imageView)
             }
         }
+
+    func setupContentStackViewConstraints() {
+        NSLayoutConstraint.activate([
+            contentStackView.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Constants.avatarToUsernameSpacing),
+            contentStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
+            contentStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.insets.right),
+            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -Constants.insets.bottom)
+        ])
+    }
 
 }
 
