@@ -1,10 +1,21 @@
 import UIKit
 
+/// Контроллер экрана отзывов
 final class ReviewsViewController: UIViewController {
-
-    private lazy var reviewsView = makeReviewsView()
+    /// Основная вью экрана
+    private lazy var reviewsView: ReviewsView = {
+        let view = ReviewsView()
+        view.tableView.delegate = viewModel
+        view.tableView.dataSource = viewModel
+        return view
+    }()
+    
+    /// ViewModel экрана
     private let viewModel: ReviewsViewModel
+    /// Индикатор загрузки
     private let activityIndicator = UIActivityIndicatorView()
+    
+    // MARK: - Init
     
     init(viewModel: ReviewsViewModel) {
         self.viewModel = viewModel
@@ -14,6 +25,8 @@ final class ReviewsViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Lifecycle
 
     override func loadView() {
         view = reviewsView
@@ -27,13 +40,10 @@ final class ReviewsViewController: UIViewController {
         viewModel.getReviews()
     }
 
-}
+    // MARK: - Private
 
-// MARK: - Private
-
-private extension ReviewsViewController {
-
-    func setupActivityIndicator() {
+    /// Настраивает и размещает индикатор загрузки
+    private func setupActivityIndicator() {
         view.addSubview(activityIndicator)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -43,14 +53,8 @@ private extension ReviewsViewController {
         activityIndicator.hidesWhenStopped = true
     }
 
-    func makeReviewsView() -> ReviewsView {
-        let reviewsView = ReviewsView()
-        reviewsView.tableView.delegate = viewModel
-        reviewsView.tableView.dataSource = viewModel
-        return reviewsView
-    }
-
-    func setupViewModel() {
+    /// Настраивает обработку изменений состояния ViewModel
+    private func setupViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self else { return }
 

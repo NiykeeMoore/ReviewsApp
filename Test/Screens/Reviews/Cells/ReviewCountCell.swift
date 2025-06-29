@@ -7,9 +7,7 @@
 
 import UIKit
 
-// MARK: - Config
-
-/// Конфигурация ячейки. Содержит данные для отображения в ячейке
+/// Конфигуратор ячейки количества отзывов
 struct ReviewCountCellConfig {
     
     /// Идентификатор для переиспользования ячейки
@@ -17,9 +15,6 @@ struct ReviewCountCellConfig {
     
     /// Текст количества отзывов
     let countText: NSAttributedString
-    
-    /// Объект, хранящий посчитанные фреймы для ячейки
-    fileprivate let layout = ReviewCountCellLayout()
 }
 
 // MARK: - TableCellConfig
@@ -29,22 +24,20 @@ extension ReviewCountCellConfig: TableCellConfig {
     func update(cell: UITableViewCell) {
         guard let cell = cell as? ReviewCountCell else { return }
         cell.countLabel.attributedText = countText
-        cell.config = self
-    }
-    
-    /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
-    /// Вызывается из `heightForRowAt:` делегата таблицы
-    func height(with size: CGSize) -> CGFloat {
-        layout.height(config: self, maxWidth: size.width)
     }
 }
 
 // MARK: - Cell
 
 final class ReviewCountCell: UITableViewCell {
-    fileprivate var config: Config?
+        private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
     
-    fileprivate let countLabel = UILabel()
+    fileprivate let countLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -55,57 +48,18 @@ final class ReviewCountCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        guard let layout = config?.layout else { return }
-        countLabel.frame = layout.countLabelFrame
-    }
-}
-
-// MARK: - Private
-
-private extension ReviewCountCell {
-    func setupCell() {
-        setupCountCell()
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        countLabel.attributedText = nil
     }
     
-    func setupCountCell() {
+    private func setupCell() {
         contentView.addSubview(countLabel)
-        countLabel.textAlignment = .center
+        NSLayoutConstraint.activate([
+            countLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: insets.top),
+            countLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left),
+            countLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
+            countLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -insets.bottom)
+        ])
     }
 }
-
-// MARK: - Layout
-
-private final class ReviewCountCellLayout {
-    private var cachedHeight: CGFloat?
-    private(set) var countLabelFrame = CGRect.zero
-    
-    /// Отступы от краёв ячейки до её содержимого.
-    private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
-    
-    func height(config: Config, maxWidth: CGFloat) -> CGFloat {
-        if let cachedHeight = cachedHeight {
-            return cachedHeight
-        }
-        
-        let contentWidth = maxWidth - insets.left - insets.right
-        let labelSize = config.countText.boundingRect(width: contentWidth).size
-        
-        countLabelFrame = CGRect(
-            x: insets.left,
-            y: insets.top,
-            width: contentWidth,
-            height: labelSize.height
-        )
-        
-        let finalHeight = insets.top + labelSize.height + insets.bottom
-        cachedHeight = finalHeight
-        return finalHeight
-    }
-}
-
-// MARK: - Typealias
-
-fileprivate typealias Config = ReviewCountCellConfig
-fileprivate typealias Layout = ReviewCountCellLayout

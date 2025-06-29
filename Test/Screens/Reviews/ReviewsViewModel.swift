@@ -12,6 +12,7 @@ final class ReviewsViewModel: NSObject {
     private let imageLoader: ImageLoader
     private let decoder: JSONDecoder
 
+    // MARK: - Init
     init(
         state: State = State(),
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
@@ -29,7 +30,7 @@ final class ReviewsViewModel: NSObject {
 
 }
 
-// MARK: - Internal
+// MARK: - Public methods
 
 extension ReviewsViewModel {
 
@@ -52,11 +53,10 @@ extension ReviewsViewModel {
 
 }
 
-// MARK: - Private
+// MARK: - Private methods
 
 private extension ReviewsViewModel {
-
-    /// Метод обработки получения отзывов.
+    /// Обработка получения отзывов.
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
         state.loadingState = .idle
         
@@ -79,7 +79,6 @@ private extension ReviewsViewModel {
                 let countItem = ReviewCountCellConfig(countText: attributedText)
                 updatedItems.append(countItem)
             }
-            
             state.items = updatedItems
         } catch {
             state.shouldLoad = true
@@ -87,15 +86,25 @@ private extension ReviewsViewModel {
         onStateChange?(state)
     }
 
-    /// Метод, вызываемый при нажатии на кнопку "Показать полностью...".
-    /// Снимает ограничение на количество строк текста отзыва (раскрывает текст).
+    /// Обработка нажатия на "Показать полностью..." — раскрывает текст отзыва.
     func showMoreReview(with id: UUID) {
         guard
             let index = state.items.firstIndex(where: { ($0 as? ReviewItem)?.id == id }),
-            var item = state.items[index] as? ReviewItem
+            let item = state.items[index] as? ReviewItem
         else { return }
-        item.maxLines = .zero
-        state.items[index] = item
+        
+        let newItem = ReviewCellConfig(
+            username: item.username,
+            ratingImage: item.ratingImage,
+            reviewText: item.reviewText,
+            maxLines: 0,
+            created: item.created,
+            avatarUrl: item.avatarUrl,
+            photoUrls: item.photoUrls,
+            imageLoader: item.imageLoader,
+            onTapShowMore: item.onTapShowMore
+        )
+        state.items[index] = newItem
         onStateChange?(state)
     }
 
@@ -107,6 +116,7 @@ private extension ReviewsViewModel {
 
     typealias ReviewItem = ReviewCellConfig
 
+    /// Создаёт ReviewItem из Review.
     func makeReviewItem(_ review: Review) -> ReviewItem {
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
@@ -118,6 +128,7 @@ private extension ReviewsViewModel {
             username: username,
             ratingImage: ratingImage,
             reviewText: reviewText,
+            maxLines: 3,
             created: created,
             avatarUrl: review.avatarUrl,
             photoUrls: review.photoUrls,
@@ -152,12 +163,7 @@ extension ReviewsViewModel: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ReviewsViewModel: UITableViewDelegate {
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        state.items[indexPath.row].height(with: tableView.bounds.size)
-    }
-
-    /// Метод дозапрашивает отзывы, если до конца списка отзывов осталось два с половиной экрана по высоте.
+    /// Дозапрашивает отзывы, если до конца списка осталось два с половиной экрана по высоте.
     func scrollViewWillEndDragging(
         _ scrollView: UIScrollView,
         withVelocity velocity: CGPoint,
@@ -182,13 +188,15 @@ extension ReviewsViewModel: UITableViewDelegate {
 
 }
 
+// MARK: - Helpers
+
 private extension ReviewsViewModel {
+    /// Возвращает корректную форму слова "отзыв" в зависимости от числа.
     func pluralizedString(for count: Int) -> String {
         let lastTwoDigits = count % 100
         if (11...19).contains(lastTwoDigits) {
             return "\(count) отзывов"
         }
-
         let lastDigit = count % 10
         switch lastDigit {
         case 1:
