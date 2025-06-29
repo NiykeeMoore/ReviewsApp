@@ -30,7 +30,7 @@ extension ReviewCountCellConfig: TableCellConfig {
 // MARK: - Cell
 
 final class ReviewCountCell: UITableViewCell {
-    //    private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
+        private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
     
     fileprivate let countLabel: UILabel = {
         let label = UILabel()

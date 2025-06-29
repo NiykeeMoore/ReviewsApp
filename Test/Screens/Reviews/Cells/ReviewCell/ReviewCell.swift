@@ -239,6 +239,8 @@ private extension ReviewCell {
 fileprivate typealias Config = ReviewCellConfig
 fileprivate typealias Constants = ReviewCell.Constants
 
+// MARK: - UI Factory
+
 private enum Factory {
     static func avatarImageView() -> UIImageView {
         let imageView = UIImageView()
