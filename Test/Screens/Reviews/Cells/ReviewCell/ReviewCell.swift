@@ -60,6 +60,15 @@ extension ReviewCellConfig: TableCellConfig {
         let actualTextHeight = reviewText.boundingRect(width: contentWidth).size.height
         let needsShowMore = maxLines != .zero && actualTextHeight > currentTextHeight
         cell.showMoreButton.isHidden = !needsShowMore
+
+        // Динамический отступ между текстом и датой
+        if cell.showMoreButton.isHidden {
+            cell.contentStackView.setCustomSpacing(Constants.reviewTextToCreatedSpacing, after: cell.reviewTextLabel)
+            cell.contentStackView.setCustomSpacing(0, after: cell.showMoreButton)
+        } else {
+            cell.contentStackView.setCustomSpacing(0, after: cell.reviewTextLabel)
+            cell.contentStackView.setCustomSpacing(Constants.showMoreToCreatedSpacing, after: cell.showMoreButton)
+        }
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -151,6 +160,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate lazy var contentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
+        stackView.alignment = .leading
         stackView.spacing = 0
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
@@ -186,9 +196,15 @@ private extension ReviewCell {
         setupHeaderStackView()
         setupPhotosStackView()
         setupReviewTextLabel()
-        setupCreatedLabel()
         setupShowMoreButton()
+        setupCreatedLabel()
         setupContentStackViewConstraints()
+
+        contentStackView.setCustomSpacing(Constants.ratingToPhotosSpacing, after: headerStackView)
+        contentStackView.setCustomSpacing(Constants.photosToTextSpacing, after: photosStackView)
+        /// Между reviewTextLabel и showMoreButton — 0 тк кнопка примыкает к тексту
+        contentStackView.setCustomSpacing(0, after: reviewTextLabel)
+        contentStackView.setCustomSpacing(Constants.showMoreToCreatedSpacing, after: showMoreButton)
     }
     
     func setupAvatarImageView() {
@@ -218,7 +234,7 @@ private extension ReviewCell {
     }
 
     func setupCreatedLabel() {
-        contentView.addSubview(createdLabel)
+        contentStackView.addArrangedSubview(createdLabel)
     }
 
     func setupShowMoreButton() {
@@ -278,9 +294,9 @@ private extension ReviewCell {
     func setupContentStackViewConstraints() {
         NSLayoutConstraint.activate([
             contentStackView.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Constants.avatarToUsernameSpacing),
-            contentStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
-            contentStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.insets.right),
-            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -Constants.insets.bottom)
+            contentStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            contentStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor)
         ])
     }
 
