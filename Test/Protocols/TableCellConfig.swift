@@ -10,11 +10,6 @@ protocol TableCellConfig {
     /// Метод для обновления текстов, изображений и другого содержимого ячейки.
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
     func update(cell: UITableViewCell)
-
-    /// Метод возвращающий актуальную высоту ячейки.
-    /// Вызывается из `heightForRowAt:` делегата таблицы.
-    func height(with size: CGSize) -> CGFloat
-
 }
 
 // MARK: - Internal
