@@ -76,17 +76,51 @@ private extension ReviewCellConfig {
 // MARK: - Cell
 
 final class ReviewCell: UITableViewCell {
-
+#warning("ne zabyd' dropnut' ety zalupu")
     fileprivate var config: Config?
-
-    fileprivate let avatarImageView = UIImageView()
-    fileprivate let usernameLabel = UILabel()
-    fileprivate let ratingImageView = UIImageView()
-    fileprivate let reviewTextLabel = UILabel()
-    fileprivate let createdLabel = UILabel()
     fileprivate var currentAvatarUrl: URL?
-    fileprivate let photosStackView = UIStackView()
-    fileprivate let showMoreButton = UIButton()
+    
+    fileprivate lazy var avatarImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = Constants.Avatar.cornerRadius
+        imageView.image = AppConstants.Placeholders.avatar
+        return imageView
+    }()
+
+    fileprivate lazy var usernameLabel = UILabel()
+    fileprivate lazy var ratingImageView = UIImageView()
+
+    fileprivate lazy var reviewTextLabel: UILabel = {
+        let label = UILabel()
+        label.lineBreakMode = .byWordWrapping
+        return label
+    }()
+    
+    fileprivate lazy var createdLabel = UILabel()
+    
+    fileprivate lazy var photosStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = Constants.Photos.spacing
+        return stackView
+    }()
+    
+    fileprivate lazy var showMoreButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.contentVerticalAlignment = .fill
+        
+        let action = UIAction { [weak self] _ in
+            guard
+                let self,
+                let id = self.config?.id
+            else { return }
+            
+            self.config?.onTapShowMore(id)
+        }
+        button.addAction(action, for: .touchUpInside)
+        return button
+    }()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -127,8 +161,6 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
-        avatarImageView.clipsToBounds = true
-        avatarImageView.layer.cornerRadius = Constants.Avatar.cornerRadius
     }
     
     func setupUsernameLabel() {
@@ -141,7 +173,6 @@ private extension ReviewCell {
     
     func setupReviewTextLabel() {
         contentView.addSubview(reviewTextLabel)
-        reviewTextLabel.lineBreakMode = .byWordWrapping
     }
 
     func setupCreatedLabel() {
@@ -150,18 +181,8 @@ private extension ReviewCell {
 
     func setupShowMoreButton() {
         contentView.addSubview(showMoreButton)
-        showMoreButton.contentVerticalAlignment = .fill
+        #warning("v update")
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
-        
-        let action = UIAction { [weak self] _ in
-            guard
-                let self,
-                let id = self.config?.id
-            else { return }
-            
-            self.config?.onTapShowMore(id)
-        }
-        showMoreButton.addAction(action, for: .touchUpInside)
     }
     
     func setAvatarPlaceholder() {
