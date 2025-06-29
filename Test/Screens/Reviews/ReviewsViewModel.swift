@@ -9,17 +9,21 @@ final class ReviewsViewModel: NSObject {
     private var state: State
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
+    private let imageLoader: ImageLoader
     private let decoder: JSONDecoder
 
     init(
         state: State = State(),
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
         ratingRenderer: RatingRenderer = RatingRenderer(),
+        imageLoader: ImageLoader,
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.state = state
         self.reviewsProvider = reviewsProvider
         self.ratingRenderer = ratingRenderer
+        self.imageLoader = imageLoader
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         self.decoder = decoder
     }
 
@@ -35,6 +39,14 @@ extension ReviewsViewModel {
     func getReviews() {
         guard state.shouldLoad else { return }
         state.shouldLoad = false
+        
+        if state.offset == 0 {
+            state.loadingState = .initial
+        } else {
+            state.loadingState = .pagination
+        }
+        
+        onStateChange?(state)
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
 
@@ -46,12 +58,29 @@ private extension ReviewsViewModel {
 
     /// Метод обработки получения отзывов.
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
+        state.loadingState = .idle
+        
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
-            state.items += reviews.items.map(makeReviewItem)
+
+            var updatedItems = state.items.filter { !($0 is ReviewCountCellConfig) }
+            updatedItems += reviews.items.map(makeReviewItem)
+
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
+
+            if !state.shouldLoad {
+                let countText = pluralizedString(for: reviews.count)
+                let attributedText = countText.attributed(
+                    font: .reviewCount,
+                    color: .reviewCount
+                )
+                let countItem = ReviewCountCellConfig(countText: attributedText)
+                updatedItems.append(countItem)
+            }
+            
+            state.items = updatedItems
         } catch {
             state.shouldLoad = true
         }
@@ -81,10 +110,22 @@ private extension ReviewsViewModel {
     func makeReviewItem(_ review: Review) -> ReviewItem {
         let reviewText = review.text.attributed(font: .text)
         let created = review.created.attributed(font: .created, color: .created)
+        let usernameText = "\(review.fullName)"
+        let username = usernameText.attributed(font: .username)
+        let ratingImage = ratingRenderer.ratingImage(review.rating)
+
         let item = ReviewItem(
+            username: username,
+            ratingImage: ratingImage,
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview
+            avatarUrl: review.avatarUrl,
+            photoUrls: review.photoUrls,
+            imageLoader: imageLoader,
+            onTapShowMore: { [weak self] id in
+                guard let self else { return }
+                self.showMoreReview(with: id)
+            }
         )
         return item
     }
@@ -139,4 +180,23 @@ extension ReviewsViewModel: UITableViewDelegate {
         return remainingDistance <= triggerDistance
     }
 
+}
+
+private extension ReviewsViewModel {
+    func pluralizedString(for count: Int) -> String {
+        let lastTwoDigits = count % 100
+        if (11...19).contains(lastTwoDigits) {
+            return "\(count) отзывов"
+        }
+
+        let lastDigit = count % 10
+        switch lastDigit {
+        case 1:
+            return "\(count) отзыв"
+        case 2, 3, 4:
+            return "\(count) отзыва"
+        default:
+            return "\(count) отзывов"
+        }
+    }
 }
