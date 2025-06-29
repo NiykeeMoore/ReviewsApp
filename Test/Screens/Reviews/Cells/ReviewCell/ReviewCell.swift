@@ -53,6 +53,13 @@ extension ReviewCellConfig: TableCellConfig {
         
         cell.loadAvatar(from: avatarUrl, using: imageLoader)
         cell.loadPhotos(from: photoUrls, using: imageLoader)
+
+        // Логика показа/скрытия showMoreButton
+        let contentWidth = cell.contentStackView.frame.width > 0 ? cell.contentStackView.frame.width : UIScreen.main.bounds.width - 60 // запас
+        let currentTextHeight = (reviewText.font()?.lineHeight ?? .zero) * CGFloat(maxLines)
+        let actualTextHeight = reviewText.boundingRect(width: contentWidth).size.height
+        let needsShowMore = maxLines != .zero && actualTextHeight > currentTextHeight
+        cell.showMoreButton.isHidden = !needsShowMore
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -141,7 +148,7 @@ final class ReviewCell: UITableViewCell {
         return button
     }()
 
-    private lazy var contentStackView: UIStackView = {
+    fileprivate lazy var contentStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 0
@@ -177,10 +184,10 @@ private extension ReviewCell {
         setupAvatarImageView()
         contentView.addSubview(contentStackView)
         setupHeaderStackView()
+        setupPhotosStackView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
-        setupPhotosStackView()
         setupContentStackViewConstraints()
     }
     
@@ -200,8 +207,14 @@ private extension ReviewCell {
         contentStackView.addArrangedSubview(headerStackView)
     }
     
+    func setupPhotosStackView() {
+        photosStackView.axis = .horizontal
+        photosStackView.spacing = Constants.Photos.spacing
+        contentStackView.addArrangedSubview(photosStackView)
+    }
+    
     func setupReviewTextLabel() {
-        contentView.addSubview(reviewTextLabel)
+        contentStackView.addArrangedSubview(reviewTextLabel)
     }
 
     func setupCreatedLabel() {
@@ -209,8 +222,7 @@ private extension ReviewCell {
     }
 
     func setupShowMoreButton() {
-        contentView.addSubview(showMoreButton)
-        #warning("v update")
+        contentStackView.addArrangedSubview(showMoreButton)
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
     }
     
@@ -241,35 +253,27 @@ private extension ReviewCell {
         }
     }
     
-    func setupPhotosStackView() {
-        contentView.addSubview(photosStackView)
-        photosStackView.axis = .horizontal
-        photosStackView.spacing = Constants.Photos.spacing
-    }
-    
     func loadPhotos(from urls: [URL], using imageLoader: ImageLoader) {
-            photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-            photosStackView.isHidden = urls.isEmpty
+        photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        photosStackView.isHidden = urls.isEmpty
 
-            for url in urls {
-                let imageView = UIImageView()
-                imageView.contentMode = .scaleAspectFill
-                imageView.clipsToBounds = true
-                imageView.layer.cornerRadius = Constants.Photos.cornerRadius
-                imageView.backgroundColor = .systemGray6
-
-                NSLayoutConstraint.activate([
-                    imageView.widthAnchor.constraint(equalToConstant: Constants.Photos.size.width),
-                    imageView.heightAnchor.constraint(equalToConstant: Constants.Photos.size.height)
-                ])
-
-                imageLoader.loadImage(from: url) { image in
-                    imageView.image = image
-                }
-
-                photosStackView.addArrangedSubview(imageView)
+        for url in urls {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = Constants.Photos.cornerRadius
+            imageView.backgroundColor = .systemGray6
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                imageView.widthAnchor.constraint(equalToConstant: Constants.Photos.size.width),
+                imageView.heightAnchor.constraint(equalToConstant: Constants.Photos.size.height)
+            ])
+            imageLoader.loadImage(from: url) { image in
+                imageView.image = image
             }
+            photosStackView.addArrangedSubview(imageView)
         }
+    }
 
     func setupContentStackViewConstraints() {
         NSLayoutConstraint.activate([

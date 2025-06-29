@@ -6,7 +6,8 @@ extension NSAttributedString {
     ///
     /// - Note: `.greatestFiniteMagnitude` значит, что ограничения по высоте нет.
     func boundingRect(width: CGFloat, height: CGFloat = .greatestFiniteMagnitude) -> CGRect {
-        boundingRect(
+        guard length > 0 else { return .zero }
+        return boundingRect(
             with: CGSize(width: width, height: height),
             options: .usesLineFragmentOrigin,
             context: nil
@@ -20,7 +21,8 @@ extension NSAttributedString {
 
     /// Метод возвращает шрифт атрибутированной строки по индексу `location`.
     func font(at location: Int = .zero) -> UIFont? {
-        attributes(at: location, effectiveRange: nil)[.font] as? UIFont
+        guard length > 0 else { return nil }
+        return attributes(at: location, effectiveRange: nil)[.font] as? UIFont
     }
 
 }
