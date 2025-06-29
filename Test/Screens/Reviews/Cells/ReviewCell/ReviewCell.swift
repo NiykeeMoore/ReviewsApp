@@ -2,10 +2,10 @@ import UIKit
 
 /// Конфигурация ячейки. Содержит данные для отображения в ячейке.
 struct ReviewCellConfig {
-
+    
     /// Идентификатор для переиспользования ячейки.
     static let reuseId = String(describing: ReviewCellConfig.self)
-
+    
     /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
     let id = UUID()
     /// Имя пользователя
@@ -15,7 +15,7 @@ struct ReviewCellConfig {
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
-    var maxLines = 3
+    let maxLines: Int
     /// Время создания отзыва.
     let created: NSAttributedString
     /// Аватар
@@ -26,13 +26,13 @@ struct ReviewCellConfig {
     let imageLoader: ImageLoader
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
-
+    
 }
 
 // MARK: - TableCellConfig
 
 extension ReviewCellConfig: TableCellConfig {
-
+    
     /// Метод обновления ячейки.
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
     func update(cell: UITableViewCell) {
@@ -46,14 +46,14 @@ extension ReviewCellConfig: TableCellConfig {
         
         cell.loadAvatar(from: avatarUrl, using: imageLoader)
         cell.loadPhotos(from: photoUrls, using: imageLoader)
-
+        
         // Логика показа/скрытия showMoreButton
         let contentWidth = cell.contentStackView.frame.width > 0 ? cell.contentStackView.frame.width : UIScreen.main.bounds.width - 60 // запас
         let currentTextHeight = (reviewText.font()?.lineHeight ?? .zero) * CGFloat(maxLines)
         let actualTextHeight = reviewText.boundingRect(width: contentWidth).size.height
         let needsShowMore = maxLines != .zero && actualTextHeight > currentTextHeight
         cell.showMoreButton.isHidden = !needsShowMore
-
+        
         // Динамический отступ между текстом и датой
         if cell.showMoreButton.isHidden {
             cell.contentStackView.setCustomSpacing(Constants.reviewTextToCreatedSpacing, after: cell.reviewTextLabel)
@@ -63,171 +63,103 @@ extension ReviewCellConfig: TableCellConfig {
             cell.contentStackView.setCustomSpacing(Constants.showMoreToCreatedSpacing, after: cell.showMoreButton)
         }
     }
-
+    
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
     /// Вызывается из `heightForRowAt:` делегата таблицы.
     func height(with size: CGSize) -> CGFloat {
         return UITableView.automaticDimension
     }
-
+    
 }
 
 // MARK: - Private
 
 private extension ReviewCellConfig {
-
+    
     /// Текст кнопки "Показать полностью...".
     static let showMoreText = "Показать полностью..."
         .attributed(font: .showMore, color: .showMore)
-
+    
 }
 
 // MARK: - Cell
 
 final class ReviewCell: UITableViewCell {
-#warning("ne zabyd' dropnut' ety zalupu")
     fileprivate var config: Config?
     fileprivate var currentAvatarUrl: URL?
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = Constants.Avatar.cornerRadius
-        imageView.image = AppConstants.Placeholders.avatar
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-
-    private lazy var headerStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = Constants.usernameToRatingSpacing
-        stackView.alignment = .leading
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-
-    fileprivate lazy var usernameLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    fileprivate lazy var ratingImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-
-    fileprivate lazy var reviewTextLabel: UILabel = {
-        let label = UILabel()
-        label.lineBreakMode = .byWordWrapping
-        return label
-    }()
+    fileprivate lazy var avatarImageView: UIImageView = Factory.avatarImageView()
+    fileprivate lazy var headerStackView: UIStackView = Factory.headerStackView()
+    fileprivate lazy var usernameLabel: UILabel = Factory.usernameLabel()
+    fileprivate lazy var ratingImageView: UIImageView = Factory.ratingImageView()
+    fileprivate lazy var reviewTextLabel: UILabel = Factory.reviewTextLabel()
+    fileprivate lazy var createdLabel: UILabel = Factory.createdLabel()
+    fileprivate lazy var photosStackView: UIStackView = Factory.photosStackView()
+    fileprivate lazy var showMoreButton: UIButton = makeShowMoreButton()
+    fileprivate lazy var contentStackView: UIStackView = Factory.contentStackView()
     
-    fileprivate lazy var createdLabel = UILabel()
-    
-    fileprivate lazy var photosStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = Constants.Photos.spacing
-        return stackView
-    }()
-    
-    fileprivate lazy var showMoreButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.contentVerticalAlignment = .fill
-        
-        let action = UIAction { [weak self] _ in
-            guard
-                let self,
-                let id = self.config?.id
-            else { return }
-            
-            self.config?.onTapShowMore(id)
-        }
-        button.addAction(action, for: .touchUpInside)
-        return button
-    }()
-
-    fileprivate lazy var contentStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.alignment = .leading
-        stackView.spacing = 0
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupCell()
     }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        usernameLabel.attributedText = nil
+        ratingImageView.image = nil
+        reviewTextLabel.attributedText = nil
+        createdLabel.attributedText = nil
+        
+        avatarImageView.image = AppConstants.Placeholders.avatar
+        currentAvatarUrl = nil
+        
+        photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        photosStackView.isHidden = true
+        
+        showMoreButton.isHidden = true
+        
+        config = nil
     }
-
 }
 
 // MARK: - Private
 
 private extension ReviewCell {
-
+    
     func setupCell() {
-        setupAvatarImageView()
+        [
+            usernameLabel,
+            ratingImageView
+        ].forEach {
+            headerStackView.addArrangedSubview($0)
+        }
+        
+        [
+            headerStackView,
+            photosStackView,
+            reviewTextLabel,
+            showMoreButton,
+            createdLabel
+        ].forEach {
+            contentStackView.addArrangedSubview($0)
+        }
+        
+        showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        
+        contentView.addSubview(avatarImageView)
         contentView.addSubview(contentStackView)
-        setupHeaderStackView()
-        setupPhotosStackView()
-        setupReviewTextLabel()
-        setupShowMoreButton()
-        setupCreatedLabel()
-        setupContentStackViewConstraints()
-
+        
+        setupConstraints()
+        
         contentStackView.setCustomSpacing(Constants.ratingToPhotosSpacing, after: headerStackView)
         contentStackView.setCustomSpacing(Constants.photosToTextSpacing, after: photosStackView)
-        /// Между reviewTextLabel и showMoreButton — 0 тк кнопка примыкает к тексту
         contentStackView.setCustomSpacing(0, after: reviewTextLabel)
         contentStackView.setCustomSpacing(Constants.showMoreToCreatedSpacing, after: showMoreButton)
-    }
-    
-    func setupAvatarImageView() {
-        contentView.addSubview(avatarImageView)
-        NSLayoutConstraint.activate([
-            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.insets.left),
-            avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
-            avatarImageView.widthAnchor.constraint(equalToConstant: Constants.Avatar.size.width),
-            avatarImageView.heightAnchor.constraint(equalToConstant: Constants.Avatar.size.height)
-        ])
-    }
-    
-    func setupHeaderStackView() {
-        headerStackView.addArrangedSubview(usernameLabel)
-        headerStackView.addArrangedSubview(ratingImageView)
-        contentStackView.addArrangedSubview(headerStackView)
-    }
-    
-    func setupPhotosStackView() {
-        photosStackView.axis = .horizontal
-        photosStackView.spacing = Constants.Photos.spacing
-        contentStackView.addArrangedSubview(photosStackView)
-    }
-    
-    func setupReviewTextLabel() {
-        contentStackView.addArrangedSubview(reviewTextLabel)
-    }
-
-    func setupCreatedLabel() {
-        contentStackView.addArrangedSubview(createdLabel)
-    }
-
-    func setupShowMoreButton() {
-        contentStackView.addArrangedSubview(showMoreButton)
-        showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
     }
     
     func setAvatarPlaceholder() {
@@ -239,7 +171,7 @@ private extension ReviewCell {
         currentAvatarUrl = url
         
         guard let url else { return }
-
+        
         imageLoader.loadImage(from: url) { [weak self] image in
             guard
                 let self,
@@ -260,7 +192,7 @@ private extension ReviewCell {
     func loadPhotos(from urls: [URL], using imageLoader: ImageLoader) {
         photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         photosStackView.isHidden = urls.isEmpty
-
+        
         for url in urls {
             let imageView = UIImageView()
             imageView.contentMode = .scaleAspectFill
@@ -278,19 +210,97 @@ private extension ReviewCell {
             photosStackView.addArrangedSubview(imageView)
         }
     }
-
-    func setupContentStackViewConstraints() {
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
+            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.insets.left),
+            avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
+            avatarImageView.widthAnchor.constraint(equalToConstant: Constants.Avatar.size.width),
+            avatarImageView.heightAnchor.constraint(equalToConstant: Constants.Avatar.size.height),
+            
             contentStackView.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: Constants.avatarToUsernameSpacing),
             contentStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
             contentStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.insets.right),
             contentStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constants.insets.bottom)
         ])
     }
-
+    
+    func makeShowMoreButton() -> UIButton {
+        let button = UIButton(type: .system)
+        button.contentVerticalAlignment = .fill
+        let action = UIAction { [weak self] _ in
+            guard
+                let self,
+                let id = self.config?.id
+            else { return }
+            self.config?.onTapShowMore(id)
+        }
+        button.addAction(action, for: .touchUpInside)
+        return button
+    }
+    
 }
 
 // MARK: - Typealias
 
 fileprivate typealias Config = ReviewCellConfig
 fileprivate typealias Constants = ReviewCell.Constants
+
+private enum Factory {
+    static func avatarImageView() -> UIImageView {
+        let imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = ReviewCell.Constants.Avatar.cornerRadius
+        imageView.image = AppConstants.Placeholders.avatar
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }
+    
+    static func headerStackView() -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = ReviewCell.Constants.usernameToRatingSpacing
+        stackView.alignment = .leading
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }
+    
+    static func usernameLabel() -> UILabel {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+    
+    static func ratingImageView() -> UIImageView {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }
+    
+    static func reviewTextLabel() -> UILabel {
+        let label = UILabel()
+        label.lineBreakMode = .byWordWrapping
+        return label
+    }
+    
+    static func createdLabel() -> UILabel {
+        let label = UILabel()
+        return label
+    }
+    
+    static func photosStackView() -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = ReviewCell.Constants.Photos.spacing
+        return stackView
+    }
+    
+    static func contentStackView() -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }
+}

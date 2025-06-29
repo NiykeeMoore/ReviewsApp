@@ -92,10 +92,21 @@ private extension ReviewsViewModel {
     func showMoreReview(with id: UUID) {
         guard
             let index = state.items.firstIndex(where: { ($0 as? ReviewItem)?.id == id }),
-            var item = state.items[index] as? ReviewItem
+            let item = state.items[index] as? ReviewItem
         else { return }
-        item.maxLines = .zero
-        state.items[index] = item
+        
+        let newItem = ReviewCellConfig(
+            username: item.username,
+            ratingImage: item.ratingImage,
+            reviewText: item.reviewText,
+            maxLines: 0,
+            created: item.created,
+            avatarUrl: item.avatarUrl,
+            photoUrls: item.photoUrls,
+            imageLoader: item.imageLoader,
+            onTapShowMore: item.onTapShowMore
+        )
+        state.items[index] = newItem
         onStateChange?(state)
     }
 
@@ -118,6 +129,7 @@ private extension ReviewsViewModel {
             username: username,
             ratingImage: ratingImage,
             reviewText: reviewText,
+            maxLines: 3,
             created: created,
             avatarUrl: review.avatarUrl,
             photoUrls: review.photoUrls,
