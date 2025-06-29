@@ -29,6 +29,7 @@
 		21ED1F652D69D0340012D6F6 /* ReviewsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */; };
 		4B9E8C802E0E90CD00102066 /* ReviewCountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E8C7F2E0E90CD00102066 /* ReviewCountCell.swift */; };
 		4B9E8C852E0EC5D500102066 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9E8C842E0EC5D500102066 /* AppConstants.swift */; };
+		4BA7B4F32E116E5A00CFAAD7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7B4F22E116E5A00CFAAD7 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +56,7 @@
 		21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsScreenFactory.swift; sourceTree = "<group>"; };
 		4B9E8C7F2E0E90CD00102066 /* ReviewCountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCountCell.swift; sourceTree = "<group>"; };
 		4B9E8C842E0EC5D500102066 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		4BA7B4F22E116E5A00CFAAD7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -97,8 +99,8 @@
 		216668752D48F39E009AAA76 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				4BA7B4F12E116E3700CFAAD7 /* ReviewCell */,
 				4B9E8C7F2E0E90CD00102066 /* ReviewCountCell.swift */,
-				21B82E252D47B0640085DAA2 /* ReviewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -202,6 +204,15 @@
 			path = Root;
 			sourceTree = "<group>";
 		};
+		4BA7B4F12E116E3700CFAAD7 /* ReviewCell */ = {
+			isa = PBXGroup;
+			children = (
+				21B82E252D47B0640085DAA2 /* ReviewCell.swift */,
+				4BA7B4F22E116E5A00CFAAD7 /* Constants.swift */,
+			);
+			path = ReviewCell;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -279,6 +290,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				21B82E392D47B1320085DAA2 /* Review.swift in Sources */,
+				4BA7B4F32E116E5A00CFAAD7 /* Constants.swift in Sources */,
 				21B8416D2D47C0E20085DAA2 /* ReviewsViewModelState.swift in Sources */,
 				21B82E2E2D47B0640085DAA2 /* ReviewCell.swift in Sources */,
 				4B9E8C852E0EC5D500102066 /* AppConstants.swift in Sources */,

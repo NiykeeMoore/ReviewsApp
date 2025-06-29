@@ -128,7 +128,7 @@ private extension ReviewCell {
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
         avatarImageView.clipsToBounds = true
-        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
+        avatarImageView.layer.cornerRadius = Constants.Avatar.cornerRadius
     }
     
     func setupUsernameLabel() {
@@ -194,7 +194,7 @@ private extension ReviewCell {
     func setupPhotosStackView() {
         contentView.addSubview(photosStackView)
         photosStackView.axis = .horizontal
-        photosStackView.spacing = Layout.photosSpacing
+        photosStackView.spacing = Constants.Photos.spacing
     }
     
     func loadPhotos(from urls: [URL], using imageLoader: ImageLoader) {
@@ -205,12 +205,12 @@ private extension ReviewCell {
                 let imageView = UIImageView()
                 imageView.contentMode = .scaleAspectFill
                 imageView.clipsToBounds = true
-                imageView.layer.cornerRadius = Layout.photoCornerRadius
+                imageView.layer.cornerRadius = Constants.Photos.cornerRadius
                 imageView.backgroundColor = .systemGray6
 
                 NSLayoutConstraint.activate([
-                    imageView.widthAnchor.constraint(equalToConstant: Layout.photoSize.width),
-                    imageView.heightAnchor.constraint(equalToConstant: Layout.photoSize.height)
+                    imageView.widthAnchor.constraint(equalToConstant: Constants.Photos.size.width),
+                    imageView.heightAnchor.constraint(equalToConstant: Constants.Photos.size.height)
                 ])
 
                 imageLoader.loadImage(from: url) { image in
@@ -235,11 +235,10 @@ private final class ReviewCellLayout {
     
     // MARK: - Размеры
 
-    fileprivate static let avatarSize = CGSize(width: 36.0, height: 36.0)
-    fileprivate static let avatarCornerRadius = 18.0
-    fileprivate static let photoCornerRadius = 8.0
-
-    fileprivate static let photoSize = CGSize(width: 55.0, height: 66.0)
+    private static let avatarSize = Constants.Avatar.size
+    private static let avatarCornerRadius = Constants.Avatar.cornerRadius
+    private static let photoCornerRadius = Constants.Photos.cornerRadius
+    private static let photoSize = Constants.Photos.size
     private static let showMoreButtonSize = Config.showMoreText.size()
 
     // MARK: - Фреймы
@@ -253,25 +252,16 @@ private final class ReviewCellLayout {
 
     // MARK: - Отступы
 
-    /// Отступы от краёв ячейки до её содержимого.
-    private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
+    private let insets = Constants.insets
+    private let avatarToUsernameSpacing = Constants.avatarToUsernameSpacing
+    private let usernameToRatingSpacing = Constants.usernameToRatingSpacing
+    private let ratingToTextSpacing = Constants.ratingToTextSpacing
+    private let ratingToPhotosSpacing = Constants.ratingToPhotosSpacing
+    private let photosSpacing = Constants.Photos.spacing
+    private let photosToTextSpacing = Constants.photosToTextSpacing
+    private let reviewTextToCreatedSpacing = Constants.reviewTextToCreatedSpacing
+    private let showMoreToCreatedSpacing = Constants.showMoreToCreatedSpacing
 
-    /// Горизонтальный отступ от аватара до имени пользователя.
-    private let avatarToUsernameSpacing = 10.0
-    /// Вертикальный отступ от имени пользователя до вью рейтинга.
-    private let usernameToRatingSpacing = 6.0
-    /// Вертикальный отступ от вью рейтинга до текста (если нет фото).
-    private let ratingToTextSpacing = 6.0
-    /// Вертикальный отступ от вью рейтинга до фото.
-    private let ratingToPhotosSpacing = 10.0
-    /// Горизонтальные отступы между фото.
-    fileprivate static let photosSpacing = 8.0
-    /// Вертикальный отступ от фото (если они есть) до текста отзыва.
-    private let photosToTextSpacing = 10.0
-    /// Вертикальный отступ от текста отзыва до времени создания отзыва или кнопки "Показать полностью..." (если она есть).
-    private let reviewTextToCreatedSpacing = 6.0
-    /// Вертикальный отступ от кнопки "Показать полностью..." до времени создания отзыва.
-    private let showMoreToCreatedSpacing = 6.0
 
     /// Сбрасывает кэш лэйаута
     func invalidateLayoutCache() {
@@ -328,7 +318,7 @@ private extension ReviewCellLayout {
         
         if !config.photoUrls.isEmpty {
             newY += ratingToPhotosSpacing
-            let stackWidth = CGFloat(config.photoUrls.count) * Self.photoSize.width + CGFloat(config.photoUrls.count - 1) * Layout.photosSpacing
+            let stackWidth = CGFloat(config.photoUrls.count) * Self.photoSize.width + CGFloat(config.photoUrls.count - 1) * Constants.Photos.spacing
             photosStackViewFrame = CGRect(
                 origin: CGPoint(x: contentX, y: newY),
                 size: CGSize(width: stackWidth, height: Self.photoSize.height)
@@ -399,4 +389,4 @@ private extension ReviewCellLayout {
 // MARK: - Typealias
 
 fileprivate typealias Config = ReviewCellConfig
-fileprivate typealias Layout = ReviewCellLayout
+fileprivate typealias Constants = ReviewCell.Constants
