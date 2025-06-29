@@ -80,11 +80,12 @@ final class ReviewCell: UITableViewCell {
     fileprivate var config: Config?
     fileprivate var currentAvatarUrl: URL?
     
-    fileprivate lazy var avatarImageView: UIImageView = {
+    private lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = Constants.Avatar.cornerRadius
         imageView.image = AppConstants.Placeholders.avatar
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
 
@@ -134,7 +135,6 @@ final class ReviewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
-        avatarImageView.frame = layout.avatarImageViewFrame
         usernameLabel.frame = layout.usernameLabelFrame
         ratingImageView.frame = layout.ratingImageViewFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
@@ -161,6 +161,12 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
+        NSLayoutConstraint.activate([
+            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.insets.left),
+            avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.insets.top),
+            avatarImageView.widthAnchor.constraint(equalToConstant: Constants.Avatar.size.width),
+            avatarImageView.heightAnchor.constraint(equalToConstant: Constants.Avatar.size.height)
+        ])
     }
     
     func setupUsernameLabel() {
