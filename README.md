@@ -1,5 +1,8 @@
 Весь новый и измененный код постарался привести в соответствие с гайдлайнами Airbnb
+
 В [dev ветке](https://github.com/NiykeeMoore/ReviewsApp/tree/dev) проект переведен на auto-layout
+
+---
 
 #### Выполненные задачи
 
